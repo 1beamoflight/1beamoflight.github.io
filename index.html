@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>1beamoflight — Roblox Backend Scripter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0b1f3a;          /* deep navy text */
+    --ink-soft:#42577a;     /* muted navy */
+    --line:#dbe4f0;         /* hairline */
+    --bg:#ffffff;
+    --bg-tint:#f4f8ff;      /* faint blue panel */
+    --blue:#1763ff;         /* primary accent */
+    --blue-deep:#0b3fb0;
+    --shot-a:#eef4ff;
+    --shot-b:#e6eefb;
+    --mono:'JetBrains Mono',monospace;
+    --display:'Sora',sans-serif;
+    --body:'Inter',sans-serif;
+    --radius:14px;
+    --maxw:1080px;
+  }
+  html[data-theme="dark"]{
+    --ink:#e8eefc;          /* light text */
+    --ink-soft:#9bb0d4;     /* muted */
+    --line:#1e2b44;         /* hairline */
+    --bg:#0a1120;           /* near-black navy */
+    --bg-tint:#111b30;      /* panel */
+    --blue:#4d8bff;         /* brighter accent for dark */
+    --blue-deep:#2f6bff;
+    --shot-a:#111b30;
+    --shot-b:#0e1729;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    transition:background .25s ease,color .25s ease;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---- nav ---- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:1.05rem}
+  .logo b{color:var(--blue)}
+  .nav-links{display:flex;gap:28px;font-size:.92rem;font-weight:500;color:var(--ink-soft)}
+  .nav-links a:hover{color:var(--blue)}
+  .nav-cta{
+    background:var(--blue);color:#fff;padding:9px 18px;border-radius:9px;
+    font-weight:600;font-size:.9rem;transition:background .15s;
+  }
+  .nav-cta:hover{background:var(--blue-deep)}
+  @media(max-width:640px){.nav-links{display:none}}
+
+  /* ---- hero ---- */
+  header{padding:96px 0 64px;position:relative;overflow:hidden}
+  .eyebrow{
+    font-family:var(--mono);font-size:.8rem;font-weight:600;
+    color:var(--blue);letter-spacing:.08em;text-transform:uppercase;
+    margin-bottom:20px;display:inline-block;
+  }
+  h1{
+    font-family:var(--display);font-weight:800;
+    font-size:clamp(2.4rem,6vw,4.2rem);line-height:1.05;
+    letter-spacing:-.03em;max-width:14ch;
+  }
+  h1 .grad{
+    background:linear-gradient(120deg,var(--blue),#39b3ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{
+    font-size:clamp(1.05rem,2vw,1.25rem);color:var(--ink-soft);
+    max-width:54ch;margin-top:24px;
+  }
+  .hero-actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+  .btn{
+    font-weight:600;font-size:.95rem;padding:13px 26px;border-radius:10px;
+    transition:transform .12s,background .15s,border-color .15s;display:inline-flex;
+    align-items:center;gap:9px;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--blue);color:#fff}
+  .btn-primary:hover{background:var(--blue-deep)}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* availability pill */
+  .avail{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:.85rem;font-weight:500;color:var(--ink-soft);
+    border:1px solid var(--line);border-radius:999px;padding:7px 15px;margin-bottom:28px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#16c172;box-shadow:0 0 0 0 rgba(22,193,114,.5);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,193,114,.5)}70%{box-shadow:0 0 0 7px rgba(22,193,114,0)}100%{box-shadow:0 0 0 0 rgba(22,193,114,0)}}
+
+  /* subtle grid bg in hero */
+  .grid-bg{
+    position:absolute;inset:0;z-index:-1;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:44px 44px;opacity:.5;
+    -webkit-mask-image:radial-gradient(ellipse 70% 60% at 70% 0%,#000 30%,transparent 75%);
+    mask-image:radial-gradient(ellipse 70% 60% at 70% 0%,#000 30%,transparent 75%);
+  }
+
+  /* ---- section frame ---- */
+  section{padding:80px 0;border-top:1px solid var(--line)}
+  .sec-head{margin-bottom:48px}
+  .sec-label{font-family:var(--mono);font-size:.78rem;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+  .sec-title{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.5vw,2.4rem);letter-spacing:-.02em;margin-top:12px}
+  .sec-intro{color:var(--ink-soft);max-width:56ch;margin-top:14px}
+
+  /* ---- skills grid ---- */
+  .skills{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:760px){.skills{grid-template-columns:1fr}}
+  .skill{
+    border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+    background:var(--bg);transition:border-color .15s,box-shadow .15s,transform .15s;
+  }
+  .skill:hover{border-color:var(--blue);box-shadow:0 8px 30px -12px rgba(23,99,255,.25);transform:translateY(-3px)}
+  .skill .ix{font-family:var(--mono);font-size:.8rem;color:var(--blue);font-weight:600}
+  .skill h3{font-family:var(--display);font-weight:700;font-size:1.15rem;margin:10px 0 8px;letter-spacing:-.01em}
+  .skill p{font-size:.94rem;color:var(--ink-soft)}
+  .skill .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .tag{font-family:var(--mono);font-size:.72rem;background:var(--bg-tint);color:var(--blue-deep);padding:4px 9px;border-radius:6px;font-weight:600}
+
+  /* ---- proof / captures ---- */
+  .proof{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.proof{grid-template-columns:1fr}}
+  .shot{
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--bg-tint);
+  }
+  .shot .ph{
+    aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);font-family:var(--mono);font-size:.85rem;text-align:center;padding:20px;
+    background:
+      repeating-linear-gradient(45deg,var(--shot-a),var(--shot-a) 12px,var(--shot-b) 12px,var(--shot-b) 24px);
+  }
+  .shot img{width:100%;display:block;aspect-ratio:16/10;object-fit:cover}
+  .shot .cap{padding:16px 18px;font-size:.9rem}
+  .shot .cap b{font-family:var(--display);display:block;margin-bottom:3px}
+  .shot .cap span{color:var(--ink-soft)}
+
+  /* ---- how I work ---- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{border-left:2px solid var(--blue);padding:6px 0 6px 20px}
+  .step .n{font-family:var(--mono);color:var(--blue);font-weight:600;font-size:.85rem}
+  .step h4{font-family:var(--display);font-weight:600;margin:6px 0 6px;font-size:1.05rem}
+  .step p{font-size:.92rem;color:var(--ink-soft)}
+
+  /* ---- contact ---- */
+  .contact-card{
+    background:linear-gradient(135deg,#0b3fb0,#1763ff);
+    border-radius:20px;padding:clamp(32px,5vw,56px);color:#fff;text-align:center;
+  }
+  .contact-card h2{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,4vw,2.6rem);letter-spacing:-.02em}
+  .contact-card p{opacity:.9;max-width:48ch;margin:16px auto 32px}
+  .discord{
+    display:inline-flex;align-items:center;gap:12px;background:#fff;color:var(--blue-deep);
+    font-family:var(--mono);font-weight:600;font-size:1.05rem;padding:15px 30px;border-radius:12px;
+    transition:transform .12s;
+  }
+  .discord:hover{transform:translateY(-2px)}
+
+  footer{padding:40px 0;border-top:1px solid var(--line);text-align:center;color:var(--ink-soft);font-size:.85rem}
+  footer .logo{font-size:.95rem;margin-bottom:8px}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">1beam<b>oflight</b></div>
+    <div class="nav-links">
+      <a href="#skills">Skills</a>
+      <a href="#proof">Proof</a>
+      <a href="#process">Process</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <button id="themeToggle" aria-label="Toggle dark mode" style="background:none;border:1px solid var(--line);color:var(--ink);width:38px;height:38px;border-radius:9px;cursor:pointer;font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:border-color .15s">🌙</button>
+      <a href="#contact" class="nav-cta">Hire me</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="grid-bg"></div>
+  <div class="wrap">
+    <div class="avail"><span class="dot"></span> Open for commissions · EN / ES / DE</div>
+    <h1>I script the stuff that runs <span class="grad">behind the game.</span></h1>
+    <p class="sub">The designs and the front-facing stuff aren't the interesting part. What's interesting is everything happening underneath — saving, economy, leaderboards. That's what I work on. You build the game; I make the systems under it actually work.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn btn-primary">Message me →</a>
+      <a href="#skills" class="btn btn-ghost">What I do</a>
+    </div>
+  </div>
+</header>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-label">What I do</div>
+      <div class="sec-title">The systems I script</div>
+      <p class="sec-intro">All of this runs on the server, not the client — the client asks, the server decides. That's what keeps things stable and a lot harder to exploit.</p>
+    </div>
+    <div class="skills">
+      <div class="skill">
+        <div class="ix">01</div>
+        <h3>Save systems</h3>
+        <p>Persistent player data with versioned structures and safe load/save, so progress survives rejoins and server shutdowns without corrupting.</p>
+        <div class="tags"><span class="tag">DataStoreService</span><span class="tag">BindToClose</span><span class="tag">pcall-guarded</span></div>
+      </div>
+      <div class="skill">
+        <div class="ix">02</div>
+        <h3>Economy &amp; progression</h3>
+        <p>Currency, upgrades, and prestige/multiplier loops validated entirely on the server, so balances can't be edited by the client.</p>
+        <div class="tags"><span class="tag">server-authoritative</span><span class="tag">upgrade curves</span><span class="tag">prestige</span></div>
+      </div>
+      <div class="skill">
+        <div class="ix">03</div>
+        <h3>Global leaderboards</h3>
+        <p>Cross-server rankings that update live — top scores read from ordered data and rendered on in-world boards or UI.</p>
+        <div class="tags"><span class="tag">OrderedDataStore</span><span class="tag">GetSortedAsync</span><span class="tag">live refresh</span></div>
+      </div>
+      <div class="skill">
+        <div class="ix">04</div>
+        <h3>Physics gameplay</h3>
+        <p>Ball physics, custom velocity launches, roll damping, and dynamic cameras that follow the action and always release cleanly.</p>
+        <div class="tags"><span class="tag">AssemblyLinearVelocity</span><span class="tag">RenderStepped</span><span class="tag">camera control</span></div>
+      </div>
+      <div class="skill">
+        <div class="ix">05</div>
+        <h3>Client–server architecture</h3>
+        <p>Clean RemoteEvent flows where the client drives feel and the server owns truth — the right split for performance and safety.</p>
+        <div class="tags"><span class="tag">RemoteEvents</span><span class="tag">anti-exploit</span><span class="tag">ModuleScripts</span></div>
+      </div>
+      <div class="skill">
+        <div class="ix">06</div>
+        <h3>In-game UI</h3>
+        <p>Functional interfaces — shops, meters, state-driven buttons, and SurfaceGui boards wired to live server data.</p>
+        <div class="tags"><span class="tag">ScreenGui</span><span class="tag">SurfaceGui</span><span class="tag">state machines</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-label">Receipts</div>
+      <div class="sec-title">Here's it actually running</div>
+      <p class="sec-intro">Screenshots from a physics kicker I scripted from scratch. Everything in the list above is live in it — not just words.</p>
+    </div>
+    <div class="proof">
+      <!-- Para cada captura: cuando subas la imagen, cambia el bloque .ph por <img src="TU_IMAGEN.png" alt="..."> -->
+      <div class="shot">
+        <div class="ph">[ captura: mecánica de chute + ciudad ]<br>screenshot_1.png</div>
+        <div class="cap"><b>Physics gameplay + infinite city</b><span>Custom ball launch, roll damping, follow-cam, and a recycling city that streams past the ball.</span></div>
+      </div>
+      <div class="shot">
+        <div class="ph">[ captura: leaderboard global ]<br>screenshot_2.png</div>
+        <div class="cap"><b>Global leaderboards</b><span>Cross-server top distances on an in-world board, read from OrderedDataStore and refreshed live.</span></div>
+      </div>
+      <div class="shot">
+        <div class="ph">[ captura: tienda / upgrades ]<br>screenshot_3.png</div>
+        <div class="cap"><b>Economy &amp; upgrades</b><span>Server-validated currency and a scaling power upgrade with cost curves.</span></div>
+      </div>
+      <div class="shot">
+        <div class="ph">[ captura: precisión / HUD ]<br>screenshot_4.png</div>
+        <div class="cap"><b>State-driven UI</b><span>Aim arrow, precision bar, and a live distance meter driven by a clean client state machine.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-label">How I work</div>
+      <div class="sec-title">Straight to the point</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">Step 1</div>
+        <h4>We agree on the scope</h4>
+        <p>We nail down exactly what the system does before I write anything, so there are no surprises later.</p>
+      </div>
+      <div class="step">
+        <div class="n">Step 2</div>
+        <h4>Built and tested in pieces</h4>
+        <p>Each system gets delivered and tested on its own. Nothing's a black box, and bugs are easy to track down.</p>
+      </div>
+      <div class="step">
+        <div class="n">Step 3</div>
+        <h4>Direct about problems</h4>
+        <p>If something won't work or there's a better way, I'll just tell you. I take direction well and reply in English, Spanish or German.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="border-top:none">
+  <div class="wrap">
+    <div class="contact-card">
+      <h2>Need something scripted?</h2>
+      <p>Tell me what your game needs on the backend and I'll tell you straight if I can do it. I'm junior but I know my way around systems — message me on Discord.</p>
+      <a href="https://discord.com/users/1beamoflight" class="discord">💬 1beamoflight</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">1beam<b style="color:var(--blue)">oflight</b></div>
+    Roblox backend scripter · Available for commissions
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    // arranca según lo que prefiera el sistema del visitante
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light');
+    function setTheme(mode){
+      root.setAttribute('data-theme', mode);
+      btn.textContent = mode === 'dark' ? '☀️' : '🌙';
+    }
+    btn.addEventListener('click', function(){
+      var now = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      setTheme(now);
+    });
+  })();
+</script>
+</body>
+</html>
